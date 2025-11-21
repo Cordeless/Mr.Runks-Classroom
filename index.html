@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hans Runk Sequence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom Keyframe for subtle mood shift animation */
+        @keyframes subtle-shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+        .shake-on-disappointment {
+            animation: subtle-shake 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+
+    <div id="app" class="w-full max-w-lg bg-white shadow-2xl rounded-xl p-6 md:p-8">
+        
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Hans Runk's Class Sequence</h1>
+        <p class="text-center text-gray-500 mb-8">Click 'Start Simulation' to run the sequence of events.</p>
+
+        <!-- Status Card -->
+        <div class="bg-indigo-50 border-2 border-indigo-200 p-4 rounded-lg mb-6">
+            <div class="flex items-center justify-between">
+                <span class="text-lg font-semibold text-indigo-700">Current Mood:</span>
+                <span id="current-mood" class="text-2xl font-extrabold text-indigo-900 transition-all duration-500">Neutral</span>
+            </div>
+            <div class="mt-2 text-sm text-indigo-600">
+                <span id="current-event">Ready to begin...</span>
+            </div>
+        </div>
+
+        <button id="start-button" onclick="startSequence()" 
+            class="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
+            Start Simulation
+        </button>
+
+        <!-- Log Area -->
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-3">Event Log:</h2>
+            <div id="log-container" class="h-64 overflow-y-auto bg-gray-100 p-3 rounded-lg border border-gray-300 text-sm">
+                <!-- Log entries go here -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Global references
+        const logContainer = document.getElementById('log-container');
+        const moodElement = document.getElementById('current-mood');
+        const eventElement = document.getElementById('current-event');
+        const startButton = document.getElementById('start-button');
+
+        // Utility function to simulate time delay using Promises
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        /**
+         * Updates the UI elements with the new event and mood.
+         * @param {string} eventText - The description of the event.
+         * @param {string} moodText - The resulting emotional state.
+         * @param {string} moodClass - Tailwind class for mood styling (optional).
+         */
+        function updateUI(eventText, moodText, moodClass = 'text-indigo-900') {
+            const time = new Date().toLocaleTimeString();
+            
+            // 1. Update Log
+            const logEntry = document.createElement('p');
+            logEntry.className = 'py-1 border-b border-gray-200 last:border-b-0';
+            logEntry.innerHTML = `<span class="text-gray-400 mr-2">${time}</span> <strong>${eventText}</strong> <span class="float-right font-medium ${moodClass}">(${moodText})</span>`;
+            logContainer.prepend(logEntry);
+            logContainer.scrollTop = 0; // Scroll to top
+
+            // 2. Update Mood Display
+            moodElement.textContent = moodText;
+            moodElement.className = `text-2xl font-extrabold transition-all duration-500 ${moodClass}`;
+            
+            // 3. Update Event Status
+            eventElement.textContent = eventText;
+            
+            // Apply visual feedback for specific moods
+            if (moodText === 'Frown') {
+                moodElement.classList.add('shake-on-disappointment');
+            } else {
+                moodElement.classList.remove('shake-on-disappointment');
+            }
+        }
+
+        /**
+         * Main sequence function using async/await to manage flow and timing.
+         */
+        async function runClassroomSequence() {
+            startButton.disabled = true;
+            startButton.textContent = "Sequence Running...";
+            logContainer.innerHTML = '';
+            
+            // --- 1. Walk into Hans Runk's classroom ---
+            updateUI(
+                "Walk into Hans Runk's classroom",
+                "Neutral"
+            );
+            await delay(1000); // 1 second pause
+
+            // --- 2. See board says test ---
+            updateUI(
+                "See board says 'TEST'",
+                "Anxious",
+                'text-yellow-600'
+            );
+            await delay(2000); // 2 second pause: Tension builds
+
+            // --- 3. Wait for Hans Runk to enter classroom ---
+            updateUI(
+                "Wait for Hans Runk to enter classroom...",
+                "Suspense",
+                'text-orange-500'
+            );
+            await delay(3500); // 3.5 second pause: Longest waiting period
+
+            // --- 4. Hans Runk enters and speaks ---
+            updateUI(
+                "Hans Runk enters, smiles, and says the test is for us.",
+                "Realization",
+                'text-red-700'
+            );
+            await delay(1000); // 1 second pause
+
+            // --- 5. Frown ---
+            updateUI(
+                "Frown (Reality sets in)",
+                "Frown",
+                'text-red-900'
+            );
+            await delay(2000); // Pause after the realization
+
+            // --- 6. Open test, see it has 33 questions and an FRQ at the end ---
+            updateUI(
+                "Click into the College Board test: 33 Multiple Choice Questions and a Free Response Question (FRQ) awaits.",
+                "Overwhelmed",
+                'text-purple-700'
+            );
+            await delay(2500); 
+
+            // --- 7. Bomb the test with a 43 ---
+            updateUI(
+                "Test results arrive: Bomb the test with a devastating score of 43.",
+                "Devastated",
+                'text-gray-900' // Dark color for despair
+            );
+            await delay(4000); // Long pause for the emotional weight
+
+            // --- 8. Leave class with dread ---
+            updateUI(
+                "Leave class, walking away with a heavy sense of dread.",
+                "Dread",
+                'text-gray-600'
+            );
+            await delay(1500); 
+
+            // --- Sequence Complete ---
+            startButton.disabled = false;
+            startButton.textContent = "Restart Simulation";
+            eventElement.textContent = "Sequence complete. The test results are final.";
+        }
+
+        /**
+         * Starts the sequence upon button click.
+         */
+        function startSequence() {
+            runClassroomSequence();
+        }
+    </script>
+</body>
+</html>
